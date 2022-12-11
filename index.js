@@ -1,6 +1,6 @@
 var width = 975*1.1, height = 610*1.1, active = d3.select(null), centered;
 
-const projection = d3.geoAlbersUsa().scale(1200).translate([width/2.0, height/2.0]);
+const projection = d3.geoAlbersUsa().scale(1150).translate([width/2.0, height/2.0]);
 const geo_path = d3.geoPath();
 
 var path = d3.geoPath() // updated for d3 v4
@@ -16,14 +16,9 @@ var g = svg.append('g');
 var description = d3.select('#data-description')
   .attr('x', width)
   .attr('y', 0)
-  .style('width', width/4 + 'px')
-  .style('heigth', height/3 + 'px')
+  .style('width', width/3.8 + 'px')
+  .style('heigth', height + 'px')
   .attr('background', 'lightgray');
-
-var appendBar = false;
-
-description.append('span').attr('id', 'case-title').text("Click to 'Circle' to see the details");
-description.append('span').attr('id', 'case-summary');
 
 function clicked(d) {
   var x, y, k;
@@ -82,7 +77,14 @@ d3.json("./component/us-states.json")
 
       function clickCircle() {
         d3.select('#case-title').text(csv.Case).append('br');
+        d3.select('#case-loc').text(csv.Location).append('br');
+        d3.select('#case-date').text(csv.Date).append('br');
+        d3.select('#case-victims').text( function() {
+            return 'Fatalites: ' + csv.Fatalities + ', Injuries: ' + csv.Injuries + ', Total Victims: ' + csv.TotalVictims; 
+          })
+          .append('br');
         d3.select('#case-summary').text(csv.summary);
+ 
       }
       
     });

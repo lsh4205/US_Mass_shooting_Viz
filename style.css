@@ -14,15 +14,23 @@ path:hover {
 	float: left;
 }
 #data-description {
-	padding: 5px 8px 5px 8px;
-	border: 1px solid #333333;
-	float: left;
-	/* width: 150px;
-	height: 200px; */
+	text-align: center;
+	border-radius: 15px;
+	display: inline-block;
+	padding: 8px 12px 8px 12px;
+	background: lightgray;
 	overflow-wrap: break-word;
 }
+
 #des-title {
-	text-align: center;
 	font-weight: bold;
-	font-size: 15px;
+	font-size: 24px;
+}
+
+#details {
+	text-align: left;
+}
+#case-title {
+	font-weight:bold;
+	font-size: 17px;
 }

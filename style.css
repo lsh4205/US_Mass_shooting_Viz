@@ -1,7 +1,28 @@
 path:hover {
 	fill-opacity: .7;
 }
-#map-feature .active {
+#states {
+	fill: lightgray;
+}
+#states .active {
 	fill: orange;
-  }
-  
+}
+#wrapper {
+	clear:both;
+}
+#map {
+	float: left;
+}
+#data-description {
+	padding: 5px 8px 5px 8px;
+	border: 1px solid #333333;
+	float: left;
+	/* width: 150px;
+	height: 200px; */
+	overflow-wrap: break-word;
+}
+#des-title {
+	text-align: center;
+	font-weight: bold;
+	font-size: 15px;
+}

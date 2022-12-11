@@ -1,4 +1,4 @@
-var width = 975*1.1, height = 610*1.1, active = d3.select(null), centered;
+var width = 975*1.05, height = 610*1.05, active = d3.select(null), centered;
 
 const projection = d3.geoAlbersUsa().scale(1150).translate([width/2.0, height/2.0]);
 const geo_path = d3.geoPath();

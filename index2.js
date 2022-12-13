@@ -1,73 +1,108 @@
-var width = 975, height = 610, active = d3.select(null), centered;
-const projection = d3.geoAlbersUsa().scale(1300).translate([width/2, height/2]);
-const geo_path = d3.geoPath();
-
-function pathContains(feature, point) {
-  const coordinates = feature.geometry.coordinates;
-  const n = coordinates.length;
-  if (!!point) {
-    for (let i = 0; i < n; i++) {
-      if (d3.polygonContains(coordinates[i][0], point)) return true;
-    }
-  }
-  return false;
-}
-var svg = d3.select("body")
+var width = 975*1.05, height = 610*1.05, active = d3.select(null), centered;
+var svg = d3.select("#map-section")
   .append("svg")
   .attr("width", width)
   .attr("height", height)
   .attr('id', 'map');
-var points = [];
-function readData() {
-  d3.csv('MassShootingsDatabase.csv', function(csv) {
-    points.push(projection([csv.Longitude, csv.Latitude]));
-  });
-}
-readData();
 
-console.log(points)
-d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/counties-albers-10m.json")
+const projection = d3.geoAlbersUsa().scale(1200).translate([width/2.0, height/2.0]);
+const geo_path = d3.geoPath();
+
+var path = d3.geoPath() // updated for d3 v4
+    .projection(projection);
+
+var data_panel = d3.select('#data-panel')
+  .attr('x', width)
+  .attr('y', 0)
+  .style('width', width/3.6 + 'px')
+  .style('height', height + 'px');
+
+var description = d3.select('#data-description')
+  .attr('background', 'lightgray');
+
+var slider_year = d3.select('#slider-year')
+  .append('svg')
+  .attr('width', width/3.6 + 'px')
+  .attr('height', 80)
+  .append('g');
+
+var year_set = 2010;
+
+d3.json("./component/us-states.json")
   .then(json => {
-    const geo_shapes = topojson.feature(json, json.objects.states);
-    d3.select("#map")
-      .selectAll("path")
-      .data(geo_shapes.features, d => d.id)
-      .join("path")
-        .attr("d", geo_path)
-        .attr("class", "map-feature")
-        .attr("fill","white")
-        .attr("stroke", "gray");
 
-    console.log(points);
-    d3.csv('MassShootingsDatabase.csv', function(csv) {
-      d3.select('#map')
-        .append('circle')
-        .attr("cx",  projection([csv.Longitude, csv.Latitude])[0])
-        .attr("cy", projection([csv.Longitude, csv.Latitude])[1])
-        .attr("r", 3)
-        .attr('opacity', 0.5);
+  svg.append('g')
+    .attr('id', 'states')
+    .selectAll("path")
+    .data(json.features)
+    .enter()
+    .append('path')
+    .attr("d", path)
+    .attr("stroke", "gray");
+
+    d3.csv('MassShootingsDatabase.csv').then(function (csv) {
+      var circle_g = svg.append('g').selectAll('circle')
+        .data(csv)
+        .enter();
+
+      circle_g.append('circle')
+        .attr('cx', function(d) {
+          return projection([d.Longitude, d.Latitude])[0];
+        })
+        .attr('cy', function(d) {
+          return projection([d.Longitude, d.Latitude])[1];
+        })
+        .attr('r', 3)
+        .attr('class', 'deselected')
+        .style('fill', 'red')
+        .on('click', function(d) {
+          d3.select('#case-title').text(d.Case).append('br');
+          d3.select('#case-loc').text(d.Location).append('br');
+          d3.select('#case-date').text(d.Date).append('br');
+          d3.select('#case-victims').text( function() {
+              return 'Fatalites: ' + d.Fatalities + ', Injuries: ' + d.Injuries + ', Total Victims: ' + d.TotalVictims; 
+            })
+            .append('br');
+          d3.select('#case-summary').text(d.summary);
+          d3.selectAll('circle').attr('class', 'deselected');
+          d3.select(this).attr('class', 'selected');
+        });
     });
-    // for (var i = 0; i < points.length; i++ ) {
-    //   console.log(i);
-    //   d3.select('#map')
-    //     .append('circle')
-    //     .attr("cx",  points[i][0])
-    //     .attr("cy", points[i][1])
-    //     .attr("r", 3)
-    //     .attr('opacity', 0.5);
-    // }
-    // d3.select('#map')
-    //   .append('circle')
-    //   .attr("cx",  projection(s)[0])
-    //   .attr("cy", projection(s)[1])
-    //   .attr("r", 3);
-    // d3.csv('MassShootingsDatabase.csv', function(csv) {
-    //   // console.log(projection([csv.Longitude, csv.Latitude]));
-    //   d3.select('#map')
-    //     .enter()
-    //     .append('circle')
-    //     .attr("cx",  projection([csv.Longitude, csv.Latitude])[0])
-    //     .attr("cy", projection([csv.Longitude, csv.Latitude])[1])
-    //     .attr("r", 3);
-    // });
-  });
+});
+
+function updateMapYear(year) {
+  var circles = d3.selectAll('circle');
+  circles.each(function(d) {
+    if (Number(d.Year) > year) {
+      console.log(d);
+      d3.selectAll('circle').style('visiblility', 'hidden');
+    } else {
+      
+    }
+  })
+}
+
+function sliderSetUp() {
+  var slider_w = width/3.9;
+  var slider_x = (width/3.6 - slider_w)/2.0;
+  var slider = d3
+    .sliderBottom()
+    .min(1980)
+    .max(2023)
+    .step(1)
+    .width(slider_w)
+    .ticks(4)
+    .default(year_set)
+    .displayValue(true)
+    .fill('lightgray')
+    .handle(
+      d3.symbol().type(d3.symbolCircle)
+      .size(200)()
+    ).on('onchange', function(num) {
+      updateMapYear(num);
+    });
+  slider_year.append('g')
+    .attr('transform', `translate(${slider_x}, 20)`)
+    .call(slider);
+}
+sliderSetUp();

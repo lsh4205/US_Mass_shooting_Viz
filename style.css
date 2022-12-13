@@ -1,6 +1,13 @@
 path:hover {
 	fill-opacity: .7;
 }
+.selected {
+	opacity: 1;
+}
+.deselected {
+	opacity: 0.3;
+}
+
 #states {
 	fill: lightgray;
 }
@@ -10,13 +17,16 @@ path:hover {
 #wrapper {
 	clear:both;
 }
-#map {
+#map-section {
+	float: left;
+}
+#data-panel {
 	float: left;
 }
 #data-description {
 	text-align: center;
 	border-radius: 15px;
-	display: inline-block;
+	
 	padding: 14px 14px 14px 14px;
 	background: lightgray;
 	overflow-wrap: break-word;

@@ -3,25 +3,30 @@
   <head>
     <title>US Mass Shooting Viz</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.3.0/d3.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-    <script type="module" src="./index.js"></script>
+    <script type="module" src="./index2.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
   </head>
   <body>
     <div id="wrapper">
-      <div id="map-section">
-      </div>
-      <div id="data-description">
-        <strong id="des-title"> US Mass Shooting Case<br ></strong>
-        <span id="case-title"> Click to 'Circle' to see the details </span>
-        <div id="details">
-          <span id="case-loc"></span>
-          <span id="case-date"></span>
-          <span id="case-victims"></span>
-          <span id="case-summary"></span>
+      <div id="map-section"></div>
+      <div id="data-panel">
+        <div id="data-description">
+          <strong id="des-title"> US Mass Shooting Case<br ></strong>
+          <span id="case-title"> Click to 'Circle' to see the details </span>
+          <div id="details">
+            <span id="case-loc"></span>
+            <span id="case-date"></span>
+            <span id="case-victims"></span>
+            <span id="case-summary"></span>
+          </div>
         </div>
+        <div id="slider-year"></div>
       </div>
+      
     </div>
   </body>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
   <!-- <script type="text/javascript" src="./index.js"></script> -->
 </html>

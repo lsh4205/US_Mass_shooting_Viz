@@ -1,148 +1,128 @@
-var width = 960;
-var height = 500;
+var width = 975*1.05, height = 610*1.05, active = d3.select(null), centered;
 
-// D3 Projection
-var projection = d3.geoAlbersUsa()
-				   .translate([width/2, height/2])    // translate to center of screen
-				   .scale([1000]);          // scale things down so see entire US
-        
-// Define path generator
-var path = d3.geoPath()               // path generator that will convert GeoJSON to SVG paths
-		  	 .projection(projection);  // tell path generator to use albersUsa projection
+const projection = d3.geoAlbersUsa().scale(1200).translate([width/2.0, height/2.0]);
+const geo_path = d3.geoPath();
 
-		
-// Define linear scale for output
-var color = d3.scaleLinear()
-			  .range(["rgb(213,222,217)","rgb(69,173,168)","rgb(84,36,55)","rgb(217,91,67)"]);
+var path = d3.geoPath() // updated for d3 v4
+    .projection(projection);
 
-var legendText = ["Cities Lived", "States Lived", "States Visited", "Nada"];
+// Set up for Description Panel
+var svg = d3.select("#map-section")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .attr('id', 'map');
 
-//Create SVG element and append map to the SVG
-var svg = d3.select("body")
-			.append("svg")
-			.attr("width", width)
-			.attr("height", height);
-        
-// Append Div for tooltip to SVG
-var div = d3.select("body")
-		    .append("div")   
-    		.attr("class", "tooltip")               
-    		.style("opacity", 0);
+var g = svg.append('g');
 
-// Load in my states data!
-d3.csv("stateslived.csv", function(data) {
-color.domain([0,1,2,3]); // setting the range of the input data
+var data_panel = d3.select('#data-panel')
+  .attr('x', width)
+  .attr('y', 0)
+  .style('width', width/3.6 + 'px')
+  .style('height', height + 'px');
 
-// Load GeoJSON data and merge with states data
-d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/counties-albers-10m.json", function(json) {
+var description = d3.select('#data-description')
+  .attr('background', 'lightgray');
 
-// Loop through each state data value in the .csv file
-for (var i = 0; i < data.length; i++) {
+var slider_year = d3.select('#slider-year')
+  .append('svg')
+  .attr('width', width/3.6 + 'px')
+  .attr('height', 80)
+  .append('g');
 
-	// Grab State Name
-	var dataState = data[i].state;
+var year_set = 2010;
 
-	// Grab data value 
-	var dataValue = data[i].visited;
-
-	// Find the corresponding state inside the GeoJSON
-	for (var j = 0; j < json.features.length; j++)  {
-		var jsonState = json.features[j].properties.name;
-
-		if (dataState == jsonState) {
-
-		// Copy the data value into the JSON
-		json.features[j].properties.visited = dataValue; 
-
-		// Stop looking through the JSON
-		break;
-		}
-	}
-}
-		
-// Bind the data to the SVG and create one path per GeoJSON feature
-svg.selectAll("path")
-	.data(json.features)
-	.enter()
-	.append("path")
-	.attr("d", path)
-	.style("stroke", "#fff")
-	.style("stroke-width", "1")
-	.style("fill", function(d) {
-
-	// Get data value
-	var value = d.properties.visited;
-
-	if (value) {
-	//If value exists…
-	return color(value);
-	} else {
-	//If value is undefined…
-	return "rgb(213,222,217)";
-	}
-});
-
-		 
-// Map the cities I have lived in!
-d3.csv("cities-lived.csv", function(data) {
-
-svg.selectAll("circle")
-	.data(data)
-	.enter()
-	.append("circle")
-	.attr("cx", function(d) {
-		return projection([d.lon, d.lat])[0];
-	})
-	.attr("cy", function(d) {
-		return projection([d.lon, d.lat])[1];
-	})
-	.attr("r", function(d) {
-		return Math.sqrt(d.years) * 4;
-	})
-		.style("fill", "rgb(217,91,67)")	
-		.style("opacity", 0.85)	
-
-	// Modification of custom tooltip code provided by Malcolm Maclean, "D3 Tips and Tricks" 
-	// http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
-	.on("mouseover", function(d) {      
-    	div.transition()        
-      	   .duration(200)      
-           .style("opacity", .9);      
-           div.text(d.place)
-           .style("left", (d3.event.pageX) + "px")     
-           .style("top", (d3.event.pageY - 28) + "px");    
-	})   
-
-    // fade out tooltip on mouse out               
-    .on("mouseout", function(d) {       
-        div.transition()        
-           .duration(500)      
-           .style("opacity", 0);   
+function sliderSetUp() {
+  var slider_w = width/3.9;
+  var slider_x = (width/3.6 - slider_w)/2.0;
+  var slider = d3
+    .sliderBottom()
+    .min(1980)
+    .max(2023)
+    .step(1)
+    .width(slider_w)
+    .ticks(4)
+    .default(year_set)
+    .displayValue(true)
+    .fill('lightgray')
+    .handle(
+      d3.symbol().type(d3.symbolCircle)
+      .size(200)()
+    ).on('onchange', function(num) {
+      
     });
-});  
-        
-// Modified Legend Code from Mike Bostock: http://bl.ocks.org/mbostock/3888852
-var legend = d3.select("body").append("svg")
-      			.attr("class", "legend")
-     			.attr("width", 140)
-    			.attr("height", 200)
-   				.selectAll("g")
-   				.data(color.domain().slice().reverse())
-   				.enter()
-   				.append("g")
-     			.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+  slider_year.append('g')
+    .attr('transform', `translate(${slider_x}, 20)`)
+    .call(slider);
+}
 
-  	legend.append("rect")
-   		  .attr("width", 18)
-   		  .attr("height", 18)
-   		  .style("fill", color);
+sliderSetUp();
 
-  	legend.append("text")
-  		  .data(legendText)
-      	  .attr("x", 24)
-      	  .attr("y", 9)
-      	  .attr("dy", ".35em")
-      	  .text(function(d) { return d; });
-	});
+function clicked(d) {
+}
 
+d3.json("./component/us-states.json")
+  .then(json => {
+
+    g.append('g')
+      .attr('id', 'states')
+      .selectAll("path")
+      .data(json.features)
+      .enter()
+      .append('path')
+      .attr("d", path)
+      .attr("stroke", "gray")
+      .on('click', clicked);
+
+    // Load the Mass shooting database
+    d3.csv('MassShootingsDatabase.csv', function(data) {
+      // const geo_shapes = topojson.feature(json, json.objects.states);
+      var csv = data;
+
+      var point = projection([csv.Longitude, csv.Latitude]);
+      var total_vic = Number(csv.TotalVictims);
+      
+      var circle_g = g.selectAll(null).data(csv.Year).enter().append('g');
+
+      circle_g.append('circle')
+        .attr('class', 'not-filtered')
+        .attr('cx', point[0])
+        .attr('cy', point[1])
+        .attr('r', !total_vic ? 0 : 0.2 * total_vic < 3 ? 3 : 0.2 * total_vic)
+        .style("fill", "red")
+        .style('opacity', 0.2)
+        .on('click', clickCircle);
+      
+      function clickCircle() {
+        d3.select('#case-title').text(csv.Case).append('br');
+        d3.select('#case-loc').text(csv.Location).append('br');
+        d3.select('#case-date').text(csv.Date).append('br');
+        d3.select('#case-victims').text( function() {
+            return 'Fatalites: ' + csv.Fatalities + ', Injuries: ' + csv.Injuries + ', Total Victims: ' + csv.TotalVictims; 
+          })
+          .append('br');
+        d3.select('#case-summary').text(csv.summary);
+        d3.select('this').style('opacity', 1);
+      }
+
+    });
 });
+console.log(projection(10, 10));
+
+
+// function reset() {
+//     active.classed("active", false);
+//     active = d3.select(null);
+  
+//     svg.transition()
+//         .duration(750)
+//         // .call( zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1) ); // not in d3 v4
+//         .call( zoom.transform, d3.zoomIdentity ); // updated for d3 v4
+// }
+
+  
+// // If the drag behavior prevents the default click,
+// // also stop propagation so we don’t click-to-zoom.
+// function stopped(event) {
+//     if (event.defaultPrevented) event.stopPropagation();
+// }

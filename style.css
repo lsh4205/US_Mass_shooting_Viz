@@ -1,6 +1,10 @@
 path:hover {
-	fill-opacity: .7;
+	fill-opacity: .5;
 }
+#data-panel {
+	padding-left: 20px;
+}
+
 .invis {
 	visibility: hidden;
 }
@@ -11,14 +15,15 @@ path:hover {
 	opacity: 1;
 }
 .deselected {
-	opacity: 0.3;
+	opacity: 0.5;
 }
+
 
 #states {
 	fill: lightgray;
 }
 #states .active {
-	fill: orange;
+	fill-opacity: 0.5;
 }
 #wrapper {
 	clear:both;
@@ -34,7 +39,8 @@ path:hover {
 	border-radius: 15px;
 	
 	padding: 14px 14px 14px 14px;
-	background: lightgray;
+	background:linear-gradient(	#c2c8c595, #ddddda7b);
+	fill-opacity: 0.3;
 	overflow-wrap: break-word;
 }
 
@@ -42,7 +48,25 @@ path:hover {
 	font-weight: bold;
 	font-size: 25px;
 }
+#case-fatalities {
+	background: -webkit-linear-gradient(#CF1020, #A6AAAF);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-size: 42px;
+}
 
+#case-injuries {
+	background: -webkit-linear-gradient(#CF1020, #A6AAAF);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-size: 42px;
+}
+#f-description {
+	font-size: 16px;
+}
+#i-description {
+	font-size: 16px;
+}
 #details {
 	text-align: left;
 }

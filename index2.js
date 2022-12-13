@@ -1,6 +1,9 @@
 var width = 975*1.05, height = 610*1.05, active = d3.select(null), centered;
 const projection = d3.geoAlbersUsa().scale(1200).translate([width/2.0, height/2.0]);
 const path = d3.geoPath().projection(projection);
+const data_panel_w = width / 3.0;
+const slider_c = width / 3.0;
+const slider_w = width / 3.4;
 
 var svg = d3.select("#map-section")
   .append("svg")
@@ -8,11 +11,10 @@ var svg = d3.select("#map-section")
   .attr("height", height)
   .attr('id', 'map');
 
-
 var data_panel = d3.select('#data-panel')
-  .attr('x', width)
+  .attr('x', 0)
   .attr('y', 0)
-  .style('width', width/3.6 + 'px')
+  .style('width', data_panel_w + 'px')
   .style('height', height + 'px');
 
 var description = d3.select('#data-description')
@@ -20,7 +22,7 @@ var description = d3.select('#data-description')
 
 var slider_year = d3.select('#slider-year')
   .append('svg')
-  .attr('width', width/3.56 + 'px')
+  .attr('width', slider_c + 'px')
   .attr('height', 80)
   .append('g');
 
@@ -99,13 +101,17 @@ function states_clicked(d) {
 }
 
 function displayDetails(d) {
+  // d3.select('#des-title').append('p');
   d3.select('#case-title').text(d.Case).append('br');
+
+  d3.select('#case-fatalities').text(d.Fatalities);
+  d3.select('#f-description').text(' casualties.').append('br');
+  d3.select('#case-injuries').text(d.Injuries);
+  d3.select('#i-description').text(' injured.').append('p');
+  
   d3.select('#case-loc').text(d.Location).append('br');
-  d3.select('#case-date').text(d.Date).append('br');
-  d3.select('#case-victims').text( function() {
-      return 'Fatalites: ' + d.Fatalities + ', Injuries: ' + d.Injuries + ', Total Victims: ' + d.TotalVictims; 
-    })
-    .append('br');
+  d3.select('#case-date').text(d.Date).append('p');
+  
   d3.select('#case-summary').text(d.summary);
 }
 
@@ -132,8 +138,7 @@ function updateMapYear(year) {
 //   opacity:1;
 
 function sliderSetUp() {
-  var slider_w = width/3.9;
-  var slider_x = (width/3.6 - slider_w)/2.0;
+  var slider_x = (data_panel_w - slider_w)/2.0;
   var slider = d3
     .sliderBottom()
     .min(1980)

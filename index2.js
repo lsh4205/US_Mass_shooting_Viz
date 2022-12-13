@@ -64,22 +64,20 @@ d3.json("./component/us-states.json")
             })
             .append('br');
           d3.select('#case-summary').text(d.summary);
-          d3.selectAll('circle').attr('class', 'deselected');
-          d3.select(this).attr('class', 'selected');
+
+          // Change only visible circles
+          d3.selectAll('.vis').attr('class', 'vis deselected');
+          d3.select(this).attr('class', 'vis selected');
         });
     });
 });
 
 function updateMapYear(year) {
   var circles = d3.selectAll('circle');
-  circles.each(function(d) {
-    if (Number(d.Year) > year) {
-      console.log(d);
-      d3.selectAll('circle').style('visiblility', 'hidden');
-    } else {
-      
-    }
-  })
+  circles.filter(d => Number(d.Year) > year)
+    .attr('class', 'invis');
+  circles.filter(d => Number(d.Year) <= year)
+    .attr('class', 'vis deselected');
 }
 
 function sliderSetUp() {
@@ -88,11 +86,11 @@ function sliderSetUp() {
   var slider = d3
     .sliderBottom()
     .min(1980)
-    .max(2023)
+    .max(2022)
     .step(1)
     .width(slider_w)
     .ticks(4)
-    .default(year_set)
+    .default(2022)
     .displayValue(true)
     .fill('lightgray')
     .handle(

@@ -7,7 +7,12 @@ path:hover {
 .deselected {
 	opacity: 0.3;
 }
-
+.invis {
+	visibility: hidden;
+}
+.vis {
+	visibility: visible;
+}
 #states {
 	fill: lightgray;
 }

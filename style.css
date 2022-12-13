@@ -1,18 +1,19 @@
 path:hover {
 	fill-opacity: .7;
 }
-.selected {
-	opacity: 1;
-}
-.deselected {
-	opacity: 0.3;
-}
 .invis {
 	visibility: hidden;
 }
 .vis {
 	visibility: visible;
 }
+.selected {
+	opacity: 1;
+}
+.deselected {
+	opacity: 0.3;
+}
+
 #states {
 	fill: lightgray;
 }

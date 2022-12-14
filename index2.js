@@ -20,15 +20,23 @@ var data_panel = d3.select('#data-panel')
 var description = d3.select('#data-description')
   .attr('background', 'lightgray');
 
+// Set-up Slider width and height
 var slider_year = d3.select('#slider-year')
   .append('svg')
   .attr('width', slider_c + 'px')
-  .attr('height', 80)
+  .attr('height', 60)
   .append('g');
 
+// Set-up slider icon and text
+d3.select('#slider-text').append('text')
+  .attr('class', 'fa')
+  .attr('font-weight', '12')
+  .text('\uf05a'); 
+d3.select('#slider-text').append('span').text('   Shooting cases based on year.');
+
+// Read US-states json to map-on and projection on svg file
 d3.json("./component/us-states.json")
   .then(json => {
-
   svg.append('g')
     .attr('id', 'states')
     .selectAll("path")
@@ -39,14 +47,15 @@ d3.json("./component/us-states.json")
     .attr("stroke", "gray")
     .on('click', states_clicked);
 
+    // Read and load the US-Mass-Shooting-Data
     d3.csv('MassShootingsDatabase.csv').then(function (csv) {
       var circle_g = svg.append('g').selectAll('circle')
         .data(csv)
         .enter();
 
+      // Create circle
       circle_g.append('circle')
         .attr('cx', function(d) {
-          console.log(d.TotalVictims);
           return projection([d.Longitude, d.Latitude])[0];
         })
         .attr('cy', function(d) {
@@ -68,6 +77,7 @@ d3.json("./component/us-states.json")
     });
 });
 
+// Click event on States
 function states_clicked(d) {
   var x, y, k;
 
@@ -100,8 +110,8 @@ function states_clicked(d) {
     .style('stroke-width', 1.5/k + 'px');
 }
 
+// Display US-Mass-Shooting cases on the detail panel
 function displayDetails(d) {
-  // d3.select('#des-title').append('p');
   d3.select('#case-title').text(d.Case).append('br');
 
   d3.select('#case-fatalities').text(d.Fatalities);
@@ -115,6 +125,7 @@ function displayDetails(d) {
   d3.select('#case-summary').text(d.summary);
 }
 
+// Update Map based on Year from slider-event
 function updateMapYear(year) {
   var circles = d3.selectAll('circle');
   circles.filter(d => Number(d.Year) > year)
@@ -137,6 +148,7 @@ function updateMapYear(year) {
 //   visibility:visible;
 //   opacity:1;
 
+// Slider Set-up 
 function sliderSetUp() {
   var slider_x = (data_panel_w - slider_w)/2.0;
   var slider = d3
@@ -157,6 +169,7 @@ function sliderSetUp() {
     })
     .tickFormat(d3.format('d'))
     .displayFormat(d3.format('d'));
+
   slider_year.append('g')
     .attr('transform', `translate(${slider_x}, 20)`)
     .call(slider);

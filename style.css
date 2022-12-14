@@ -1,6 +1,9 @@
 path:hover {
 	fill-opacity: .5;
 }
+hr.solid {
+	border-top: 1.5px solid #bbb;
+}
 #data-panel {
 	padding-left: 20px;
 }
@@ -38,15 +41,15 @@ path:hover {
 	text-align: center;
 	border-radius: 15px;
 	
-	padding: 14px 14px 14px 14px;
-	background:linear-gradient(	#c2c8c595, #ddddda7b);
+	padding: 18px 20px 16px 20px;
+	background:linear-gradient(	#c2c8c5aa, #ddddda8d);
 	fill-opacity: 0.3;
 	overflow-wrap: break-word;
 }
 
 #des-title {
 	font-weight: bold;
-	font-size: 25px;
+	font-size: 27px;
 }
 #case-fatalities {
 	background: -webkit-linear-gradient(#CF1020, #A6AAAF);
@@ -67,10 +70,14 @@ path:hover {
 #i-description {
 	font-size: 16px;
 }
+#slider-text {
+	color: gray;
+	padding-top: 12px;
+	padding-left: 5px;
+}
 #details {
 	text-align: left;
 }
 #case-title {
-	font-weight:bold;
 	font-size: 17px;
 }

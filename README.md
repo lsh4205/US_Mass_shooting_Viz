@@ -11,6 +11,11 @@ U.S. Mass Shooting Visualization is designed to display the mass shooting cases 
 
 * A [TopoJSON file](https://github.com/topojson/topojson-specification/blob/master/README.md#21-topology-objects) file containing the geometry collections counties, states, and nation. The geometry is quantized, projected using [d3.geoAlbersUsa](https://github.com/d3/d3-geo/blob/master/README.md#geoAlbersUsa) to fit a 975×610 viewport, and simplified. 
 
+## Implementation 
+
+![short-ver2](https://user-images.githubusercontent.com/63761734/207584585-438de7ae-b696-4421-b9e8-5b8a7f55536b.gif)
+
+
 ## Usage
 
 ```js

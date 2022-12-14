@@ -2,10 +2,7 @@ path:hover {
 	fill-opacity: .5;
 }
 hr.solid {
-	border-top: 1.5px solid #bbb;
-}
-#data-panel {
-	padding-left: 20px;
+	border-top: 1.5px solid rgb(175, 175, 175);
 }
 
 .invis {
@@ -21,7 +18,9 @@ hr.solid {
 	opacity: 0.5;
 }
 
-
+#data-panel {
+	padding-left: 20px;
+}
 #states {
 	fill: lightgray;
 }
@@ -71,7 +70,7 @@ hr.solid {
 	font-size: 16px;
 }
 #slider-text {
-	color: gray;
+	color: rgb(93, 93, 93);
 	padding-top: 12px;
 	padding-left: 5px;
 }

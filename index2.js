@@ -133,20 +133,6 @@ function updateMapYear(year) {
   circles.filter(d => Number(d.Year) <= year)
     .attr('class', 'vis deselected');
 }
-// .menu {
-//   visibility:hidden;
-//   opacity:0;
-//   transition:visibility 0.3s linear,opacity 0.3s linear;
-  
-//   background:#eee;
-//   width:100px;
-//   margin:0;
-//   padding:5px;
-//   list-style:none;
-// }
-// div:hover > .menu {
-//   visibility:visible;
-//   opacity:1;
 
 // Slider Set-up 
 function sliderSetUp() {

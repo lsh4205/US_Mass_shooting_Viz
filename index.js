@@ -1,131 +1,163 @@
 var width = 975*1.05, height = 610*1.05, active = d3.select(null), centered;
-
 const projection = d3.geoAlbersUsa().scale(1200).translate([width/2.0, height/2.0]);
-const geo_path = d3.geoPath();
+const path = d3.geoPath().projection(projection);
+const data_panel_w = width / 3.0;
+const slider_c = width / 3.0;
+const slider_w = width / 3.4;
 
-var path = d3.geoPath() // updated for d3 v4
-    .projection(projection);
-
-// Set up for Description Panel
 var svg = d3.select("#map-section")
   .append("svg")
   .attr("width", width)
   .attr("height", height)
   .attr('id', 'map');
 
-var g = svg.append('g');
-
 var data_panel = d3.select('#data-panel')
-  .attr('x', width)
+  .attr('x', 0)
   .attr('y', 0)
-  .style('width', width/3.6 + 'px')
+  .style('width', data_panel_w + 'px')
   .style('height', height + 'px');
 
 var description = d3.select('#data-description')
   .attr('background', 'lightgray');
 
+// Set-up Slider width and height
 var slider_year = d3.select('#slider-year')
   .append('svg')
-  .attr('width', width/3.6 + 'px')
-  .attr('height', 80)
+  .attr('width', slider_c + 'px')
+  .attr('height', 60)
   .append('g');
 
-var year_set = 2010;
+// Set-up slider icon and text
+d3.select('#slider-text').append('text')
+  .attr('class', 'fa')
+  .attr('font-weight', '12')
+  .text('\uf05a'); 
+d3.select('#slider-text').append('span').text('   Shooting cases based on year.');
 
+// Read US-states json to map-on and projection on svg file
+d3.json("./component/us-states.json")
+  .then(json => {
+  svg.append('g')
+    .attr('id', 'states')
+    .selectAll("path")
+    .data(json.features)
+    .enter()
+    .append('path')
+    .attr("d", path)
+    .attr("stroke", "gray")
+    .on('click', states_clicked);
+
+    // Read and load the US-Mass-Shooting-Data
+    d3.csv('MassShootingsDatabase.csv').then(function (csv) {
+      var circle_g = svg.append('g').selectAll('circle')
+        .data(csv)
+        .enter();
+
+      // Create circle
+      circle_g.append('circle')
+        .attr('cx', function(d) {
+          return projection([d.Longitude, d.Latitude])[0];
+        })
+        .attr('cy', function(d) {
+          return projection([d.Longitude, d.Latitude])[1];
+        })
+        .attr('r', d => isNaN(d.TotalVictims) ? 0 
+          : 0.3 * d.TotalVictims < 4 ? 4 
+          : 0.3 * d.TotalVictims > 20 ? 20
+          : 0.3 * d.TotalVictims)
+        .attr('class', 'deselected')
+        .style('fill', 'red')
+        .style('stroke', 'white')
+        .on('click', function(d) {
+          displayDetails(d);
+          // Change only visible circles
+          d3.selectAll('.vis').attr('class', 'vis deselected');
+          d3.select(this).attr('class', 'vis selected');
+        });
+    });
+});
+
+// Click event on States
+function states_clicked(d) {
+  var x, y, k;
+
+  if (d && centered !== d) {
+    var centroid = path.centroid(d);
+    x = centroid[0];
+    y = centroid[1];
+    k = 2.5;
+    centered = d;
+  } else {
+    x = width / 2;
+    y = height / 2;
+    k = 1;
+    centered = null;
+  }
+  var states = d3.select('#states')
+  states.selectAll("path")
+      .classed("active", centered && function(d) { return d === centered; });
+
+  // Translate Map path and zoom
+  states.transition()
+      .duration(750)
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+      .style("stroke-width", 1.5 / k + "px");
+  
+  // Translate circle data and zoom
+  svg.selectAll('circle')
+    .transition().duration(750)
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+    .style('stroke-width', 1.5/k + 'px');
+}
+
+// Display US-Mass-Shooting cases on the detail panel
+function displayDetails(d) {
+  d3.select('#case-title').text(d.Case).append('br');
+
+  d3.select('#case-fatalities').text(d.Fatalities);
+  d3.select('#f-description').text(' casualties.').append('br');
+  d3.select('#case-injuries').text(d.Injuries);
+  d3.select('#i-description').text(' injured.').append('p');
+  
+  d3.select('#case-loc').text(d.Location).append('br');
+  d3.select('#case-date').text(d.Date).append('p');
+  
+  d3.select('#case-summary').text(d.summary);
+}
+
+// Update Map based on Year from slider-event
+function updateMapYear(year) {
+  var circles = d3.selectAll('circle');
+  circles.filter(d => Number(d.Year) > year)
+    .attr('class', 'invis')
+  circles.filter(d => Number(d.Year) <= year)
+    .attr('class', 'vis deselected');
+}
+
+// Slider Set-up 
 function sliderSetUp() {
-  var slider_w = width/3.9;
-  var slider_x = (width/3.6 - slider_w)/2.0;
+  var slider_x = (data_panel_w - slider_w)/2.0;
   var slider = d3
     .sliderBottom()
     .min(1980)
-    .max(2023)
+    .max(2022)
     .step(1)
     .width(slider_w)
     .ticks(4)
-    .default(year_set)
+    .default(2022)
     .displayValue(true)
     .fill('lightgray')
     .handle(
       d3.symbol().type(d3.symbolCircle)
       .size(200)()
     ).on('onchange', function(num) {
-      
-    });
+      updateMapYear(num);
+    })
+    .tickFormat(d3.format('d'))
+    .displayFormat(d3.format('d'));
+
   slider_year.append('g')
     .attr('transform', `translate(${slider_x}, 20)`)
     .call(slider);
 }
-
 sliderSetUp();
-
-function clicked(d) {
-}
-
-d3.json("./component/us-states.json")
-  .then(json => {
-
-    g.append('g')
-      .attr('id', 'states')
-      .selectAll("path")
-      .data(json.features)
-      .enter()
-      .append('path')
-      .attr("d", path)
-      .attr("stroke", "gray")
-      .on('click', clicked);
-});
-// Load the Mass shooting database
-d3.csv('MassShootingsDatabase.csv').then(function(data) {
-  // const geo_shapes = topojson.feature(json, json.objects.states);
-  var csv = data;
-
-  var point = projection([csv.Longitude, csv.Latitude]);
-  console.log(point);
-  var total_vic = Number(csv.TotalVictims);
-  
-  var circle_g = g.selectAll('circle').data(csv).enter();
-
-  circle_g.append('circle')
-    .data(csv)
-    .attr('class', 'not-filtered')
-    .attr('cx', function(d) {
-      console.log(d.Longitude);
-      return projection([Number(d.Longitude), Number(d.Latitude)])[0];
-    })
-    .attr('cy', function (d) {
-      return projection([Number(d.Latitude), Number(d.Longitude)])[1];
-    })
-    .attr('r', !total_vic ? 0 : 0.2 * total_vic < 3 ? 3 : 0.2 * total_vic)
-    .style("fill", "red")
-    .style('opacity', 0.2)
-    .on('click', clickCircle);
-  
-  function clickCircle() {
-    d3.select('#case-title').text(csv.Case).append('br');
-    d3.select('#case-loc').text(csv.Location).append('br');
-    d3.select('#case-date').text(csv.Date).append('br');
-    d3.select('#case-victims').text( function() {
-        return 'Fatalites: ' + csv.Fatalities + ', Injuries: ' + csv.Injuries + ', Total Victims: ' + csv.TotalVictims; 
-      })
-      .append('br');
-    d3.select('#case-summary').text(csv.summary);
-    d3.select('this').style('opacity', 1);
-  }
-});
-
-// function reset() {
-//     active.classed("active", false);
-//     active = d3.select(null);
-  
-//     svg.transition()
-//         .duration(750)
-//         // .call( zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1) ); // not in d3 v4
-//         .call( zoom.transform, d3.zoomIdentity ); // updated for d3 v4
-// }
-
-  
-// // If the drag behavior prevents the default click,
-// // also stop propagation so we don’t click-to-zoom.
-// function stopped(event) {
-//     if (event.defaultPrevented) event.stopPropagation();
-// }

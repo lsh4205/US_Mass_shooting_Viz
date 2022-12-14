@@ -1,6 +1,6 @@
 # U.S. Mass Shooting Visualization
 
-U.S. Mass Shooting Visualization presents the mass shooting cases in the USA through the map.
+U.S. Mass Shooting Visualization is designed to display the mass shooting cases in the USA through the map.
 
 ## Data Source
 <b>MassShootingsDataBase.csv</b> ⋅ [Download](https://www.motherjones.com/politics/2012/12/mass-shootings-mother-jones-full-data/)
@@ -163,14 +163,5 @@ function states_clicked(d) {
 }
 ```
 
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
+## Reference
+* Zoom effect ⋅ [click-to-zoom via transform](https://bl.ocks.org/mbostock/2206590)

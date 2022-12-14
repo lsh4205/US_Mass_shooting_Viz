@@ -44,7 +44,9 @@ d3.json("./component/us-states.json")
 // Create circle
       circle_g.append('circle')
 ```
+
     1. Set the coordinate of each circle based on the _projection_ with _Longitude_ and _Latitude_ from the data.
+
 ```js
 circle_g.append('circle')
         .attr('cx', function(d) {
@@ -54,6 +56,7 @@ circle_g.append('circle')
           return projection([d.Longitude, d.Latitude])[1];
         });
 ```
+
     2. Change the radius based on the number of _TotalVictims_ from the data. 
     (Set the size of the radius for visibility).
 

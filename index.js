@@ -44,7 +44,6 @@ d3.json("./component/us-states.json")
     .enter()
     .append('path')
     .attr("d", path)
-    .attr("stroke", "gray")
     .on('click', states_clicked);
 
     // Read and load the US-Mass-Shooting-Data
